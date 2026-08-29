@@ -5418,7 +5418,7 @@ LGraphNode.prototype.executeAction = function(action)
 		this.onAfterChange = null; //called after modifying the graph
 
         this.connections_width = 3;
-        this.round_radius = 8;
+        12 = 8;
 
         this.current_node = null;
         this.node_widget = null; //used for widgets
@@ -8416,8 +8416,8 @@ LGraphNode.prototype.executeAction = function(action)
             ctx.save();
             this.ds.toCanvasContext(ctx);
 
-            //render BG
-            if ( this.ds.scale < 1.5 && !bg_already_painted && this.clear_background_color )
+            //render BG - no optimization on zoom, always render
+            if ( !bg_already_painted && this.clear_background_color )
             {
                 ctx.fillStyle = this.clear_background_color;
                 ctx.fillRect(
@@ -8542,7 +8542,7 @@ LGraphNode.prototype.executeAction = function(action)
             glow = true;
         }
 
-        var low_quality = false; //this.ds.scale < 0.6; //zoomed out
+        var low_quality = false; //always full quality, no optimization on zoom
 
         //only render if it forces it to do it
         if (this.live_mode) {
@@ -9035,7 +9035,7 @@ LGraphNode.prototype.executeAction = function(action)
         ctx.fillStyle = bgcolor;
 
         var title_height = LiteGraph.NODE_TITLE_HEIGHT;
-        var low_quality = false; //this.ds.scale < 0.5;
+        var low_quality = false; //always full quality, no optimization on zoom
 
         //render node area depending on shape
         var shape =
@@ -9073,7 +9073,7 @@ LGraphNode.prototype.executeAction = function(action)
                     area[1],
                     area[2],
                     area[3],
-                    shape == LiteGraph.CARD_SHAPE ? [this.round_radius,this.round_radius,0,0] : [this.round_radius] 
+                    shape == LiteGraph.CARD_SHAPE ? [12,12,0,0] : [12] 
                 );
             } else if (shape == LiteGraph.CIRCLE_SHAPE) {
                 ctx.arc(
@@ -9086,13 +9086,17 @@ LGraphNode.prototype.executeAction = function(action)
             }
             ctx.fill();
 
-			//separator
-			if(!node.flags.collapsed && render_title)
-			{
-				ctx.shadowColor = "transparent";
-				ctx.fillStyle = "rgba(0,0,0,0.2)";
-				ctx.fillRect(0, -1, area[2], 2);
-			}
+                //separator - subtle line instead of dark bar
+				if(!node.flags.collapsed && render_title)
+				{
+					ctx.shadowColor = "transparent";
+					ctx.strokeStyle = "rgba(0,0,0,0.1)";
+					ctx.lineWidth = 1;
+					ctx.beginPath();
+					ctx.moveTo(0, 0);
+					ctx.lineTo(area[2], 0);
+					ctx.stroke();
+				}
         }
         ctx.shadowColor = "transparent";
 
@@ -9138,7 +9142,7 @@ LGraphNode.prototype.executeAction = function(action)
                         -title_height,
                         size[0] + 1,
                         title_height,
-                        node.flags.collapsed ? [this.round_radius] : [this.round_radius,this.round_radius,0,0]
+                        node.flags.collapsed ? [12] : [12,12,0,0]
                     );
                 }
                 ctx.fill();
@@ -9223,35 +9227,731 @@ LGraphNode.prototype.executeAction = function(action)
                     selected
                 );
             }
-            if (!low_quality) {
-                ctx.font = this.title_text_font;
-                var title = String(node.getTitle());
-                if (title) {
-                    if (selected) {
-                        ctx.fillStyle = LiteGraph.NODE_SELECTED_TITLE_COLOR;
-                    } else {
-                        ctx.fillStyle =
-                            node.constructor.title_text_color ||
-                            this.node_title_color;
-                    }
-                    if (node.flags.collapsed) {
-                        ctx.textAlign = "left";
-                        var measure = ctx.measureText(title);
-                        ctx.fillText(
-                            title.substr(0,20), //avoid urls too long
-                            title_height,// + measure.width * 0.5,
-                            LiteGraph.NODE_TITLE_TEXT_Y - title_height
-                        );
-                        ctx.textAlign = "left";
-                    } else {
-                        ctx.textAlign = "left";
-                        ctx.fillText(
-                            title,
-                            title_height,
-                            LiteGraph.NODE_TITLE_TEXT_Y - title_height
-                        );
-                    }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
                 }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
+            // Title text with improved styling
+            ctx.font = "bold " + LiteGraph.NODE_TEXT_SIZE + "px Arial";
+            var title = String(node.getTitle());
+            if (title) {
+                if (selected) {
+                    ctx.fillStyle = "#FFF";
+                } else {
+                    ctx.fillStyle = "#FFF"; // Always white for better contrast
+                }
+                if (node.flags.collapsed) {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title.substr(0, 20),
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                } else {
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        title,
+                        title_height,
+                        LiteGraph.NODE_TITLE_TEXT_Y - title_height
+                    );
+                }
+            }
             }
 
 			//subgraph box
@@ -9311,7 +10011,7 @@ LGraphNode.prototype.executeAction = function(action)
                     -6 + area[1],
                     12 + area[2],
                     12 + area[3],
-                    [this.round_radius * 2]
+                    [12 * 2]
                 );
             } else if (shape == LiteGraph.CARD_SHAPE) {
                 ctx.roundRect(
@@ -9319,7 +10019,7 @@ LGraphNode.prototype.executeAction = function(action)
                     -6 + area[1],
                     12 + area[2],
                     12 + area[3],
-                    [this.round_radius * 2,2,this.round_radius * 2,2]
+                    [12 * 2,2,12 * 2,2]
                 );
             } else if (shape == LiteGraph.CIRCLE_SHAPE) {
                 ctx.arc(
