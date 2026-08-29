@@ -8416,8 +8416,8 @@ LGraphNode.prototype.executeAction = function(action)
             ctx.save();
             this.ds.toCanvasContext(ctx);
 
-            //render BG
-            if ( this.ds.scale < 1.5 && !bg_already_painted && this.clear_background_color )
+            //render BG - no optimization on zoom, always render
+            if ( !bg_already_painted && this.clear_background_color )
             {
                 ctx.fillStyle = this.clear_background_color;
                 ctx.fillRect(
@@ -8542,7 +8542,7 @@ LGraphNode.prototype.executeAction = function(action)
             glow = true;
         }
 
-        var low_quality = false; //this.ds.scale < 0.6; //zoomed out
+        var low_quality = false; //always full quality, no optimization on zoom
 
         //only render if it forces it to do it
         if (this.live_mode) {
@@ -9035,7 +9035,7 @@ LGraphNode.prototype.executeAction = function(action)
         ctx.fillStyle = bgcolor;
 
         var title_height = LiteGraph.NODE_TITLE_HEIGHT;
-        var low_quality = false; //this.ds.scale < 0.5;
+        var low_quality = false; //always full quality, no optimization on zoom
 
         //render node area depending on shape
         var shape =
